@@ -106,7 +106,7 @@ const CHAT_ROOM_DATA: { [key: string]: ChatRoomData } = {
     },
     itemTitle: '캠핑 텐트 대여',
     itemImage: 'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=100',
-    isRenting: true, // QR 계약 체결됨
+    isRenting: false,
   },
   'sample_chat_2': {
     id: 'sample_chat_2',
@@ -116,7 +116,7 @@ const CHAT_ROOM_DATA: { [key: string]: ChatRoomData } = {
     },
     itemTitle: '전동드릴 대여',
     itemImage: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=100',
-    isRenting: false,
+    isRenting: true,
   },
 };
 
