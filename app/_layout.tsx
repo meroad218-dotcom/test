@@ -12,10 +12,9 @@ export default function RootLayout() {
     <UserProvider>
       <ChatProvider>
         <Stack
-          screenOptions={{ 
+          screenOptions={{
             headerShown: false,
           }}
-          initialRouteName="splash"
         >
           <Stack.Screen name="splash" />
           <Stack.Screen name="(tabs)" />

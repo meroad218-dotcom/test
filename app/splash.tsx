@@ -1,13 +1,8 @@
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/Theme';
+import Logo from '@/components/Logo';
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -39,10 +34,7 @@ export default function SplashScreen() {
   }, []);
 
   return (
-    <LinearGradient
-      colors={[Colors.primary, Colors.primaryDark]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Animated.View
         style={[
           styles.logoContainer,
@@ -52,34 +44,24 @@ export default function SplashScreen() {
           },
         ]}
       >
-        {/* 로고 아이콘 */}
+        {/* 로고 */}
         <View style={styles.logoIcon}>
-          <Text style={styles.logoEmoji}>🏠</Text>
-          <View style={styles.exchangeIcon}>
-            <Text style={styles.exchangeEmoji}>🔄</Text>
-          </View>
+          <Logo size={120} variant="blue" />
         </View>
 
         {/* 앱 이름 */}
         <Text style={styles.appName}>대여해영</Text>
         <Text style={styles.appSubtitle}>이웃과 함께하는 스마트 대여</Text>
-
-        {/* 로딩 인디케이터 */}
-        <View style={styles.loadingContainer}>
-          <View style={styles.loadingDots}>
-            <Animated.View style={[styles.dot, styles.dot1]} />
-            <Animated.View style={[styles.dot, styles.dot2]} />
-            <Animated.View style={[styles.dot, styles.dot3]} />
-          </View>
-        </View>
       </Animated.View>
 
       {/* 하단 텍스트 */}
       <Animated.View style={[styles.bottomContainer, { opacity: fadeAnim }]}>
-        <Text style={styles.bottomText}>필요한 것은 빌리고, 남는 것은 빌려주고</Text>
+        <Text style={styles.bottomText}>
+          필요한 것은 빌리고, 남는 것은 빌려주고
+        </Text>
         <Text style={styles.versionText}>v1.0.0</Text>
       </Animated.View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -89,69 +71,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
+    backgroundColor: '#ffffff',
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 80,
   },
   logoIcon: {
-    position: 'relative',
-    marginBottom: 32,
-  },
-  logoEmoji: {
-    fontSize: 80,
-    textAlign: 'center',
-  },
-  exchangeIcon: {
-    position: 'absolute',
-    bottom: -10,
-    right: -10,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  exchangeEmoji: {
-    fontSize: 20,
-  },
-  appName: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: 'white',
-    marginBottom: 8,
-    textAlign: 'center',
-    letterSpacing: -1,
-  },
-  appSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
     marginBottom: 40,
   },
-  loadingContainer: {
-    alignItems: 'center',
+  appName: {
+    fontSize: 42,
+    fontWeight: '800',
+    color: '#333333',
+    marginBottom: 12,
+    textAlign: 'center',
+    letterSpacing: -1.5,
   },
-  loadingDots: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    marginHorizontal: 4,
-  },
-  dot1: {
-    animationDelay: '0s',
-  },
-  dot2: {
-    animationDelay: '0.2s',
-  },
-  dot3: {
-    animationDelay: '0.4s',
+  appSubtitle: {
+    fontSize: 17,
+    color: '#666666',
+    textAlign: 'center',
+    marginBottom: 50,
+    fontWeight: '300',
+    letterSpacing: 0.5,
   },
   bottomContainer: {
     position: 'absolute',
@@ -160,12 +103,12 @@ const styles = StyleSheet.create({
   },
   bottomText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#999999',
     textAlign: 'center',
     marginBottom: 16,
   },
   versionText: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: '#BBBBBB',
   },
 });

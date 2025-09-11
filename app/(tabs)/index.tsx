@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -35,10 +36,11 @@ const SAMPLE_POSTS: RentalPost[] = [
     period: '1일~7일',
     location: '서울시 강남구',
     distance: '0.3km',
-    image: 'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image:
+      'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=400',
     views: 23,
     timeAgo: '5분 전',
-    userId: 'user1'
+    userId: 'user1',
   },
   {
     id: '2',
@@ -47,10 +49,11 @@ const SAMPLE_POSTS: RentalPost[] = [
     period: '1일~3일',
     location: '서울시 강남구',
     distance: '0.8km',
-    image: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image:
+      'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=400',
     views: 15,
     timeAgo: '1시간 전',
-    userId: 'user2'
+    userId: 'user2',
   },
   {
     id: '3',
@@ -59,10 +62,11 @@ const SAMPLE_POSTS: RentalPost[] = [
     period: '1일~5일',
     location: '서울시 강남구',
     distance: '0.9km',
-    image: 'https://images.pexels.com/photos/735911/pexels-photo-735911.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image:
+      'https://images.pexels.com/photos/735911/pexels-photo-735911.jpeg?auto=compress&cs=tinysrgb&w=400',
     views: 42,
     timeAgo: '3시간 전',
-    userId: 'user3'
+    userId: 'user3',
   },
   {
     id: '4',
@@ -71,17 +75,20 @@ const SAMPLE_POSTS: RentalPost[] = [
     period: '1일~14일',
     location: '서울시 강남구',
     distance: '0.7km',
-    image: 'https://images.pexels.com/photos/274937/pexels-photo-274937.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image:
+      'https://images.pexels.com/photos/274937/pexels-photo-274937.jpeg?auto=compress&cs=tinysrgb&w=400',
     views: 31,
     timeAgo: '5시간 전',
-    userId: 'user4'
-  }
+    userId: 'user4',
+  },
 ];
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState<RentalPost[]>(SAMPLE_POSTS);
   const [refreshing, setRefreshing] = useState(false);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -131,15 +138,15 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         {posts.map((post) => (
-          <TouchableOpacity 
-            key={post.id} 
+          <TouchableOpacity
+            key={post.id}
             style={styles.postCard}
             onPress={() => handlePostPress(post.id)}
           >
