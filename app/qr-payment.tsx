@@ -52,7 +52,11 @@ export default function QRPaymentScreen() {
   const signatureRef = useRef<any>(null);
 
   const handleBack = () => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/chat');
+    }
   };
 
   // 1단계: QR 생성 조건 입력 (판매자)
@@ -116,7 +120,12 @@ export default function QRPaymentScreen() {
         {
           text: '확인',
           onPress: () => {
-            router.back();
+            // 채팅방으로 돌아가기
+            if (chatRoomId) {
+              router.replace(`/chat-room/${chatRoomId}`);
+            } else {
+              router.replace('/(tabs)/chat');
+            }
           },
         },
       ]
