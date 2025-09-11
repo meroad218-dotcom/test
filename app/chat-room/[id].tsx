@@ -34,45 +34,90 @@ interface ChatRoomData {
   };
   itemTitle: string;
   itemImage: string;
+  isRenting?: boolean;
 }
 
-const SAMPLE_MESSAGES: Message[] = [
-  {
-    id: '1',
-    text: '안녕하세요! 캠핑 텐트 대여 문의드립니다.',
-    isMe: true,
-    timestamp: '14:30',
-  },
-  {
-    id: '2',
-    text: '안녕하세요! 언제 사용하실 예정이신가요?',
-    isMe: false,
-    timestamp: '14:32',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-  },
-  {
-    id: '3',
-    text: '이번 주말 1박2일로 사용하고 싶습니다.',
-    isMe: true,
-    timestamp: '14:33',
-  },
-  {
-    id: '4',
-    text: '네, 가능합니다! 보증금은 현금으로 5만원 받습니다.',
-    isMe: false,
-    timestamp: '14:35',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-  },
-];
+// 채팅방별 메시지 데이터
+const CHAT_MESSAGES: { [key: string]: Message[] } = {
+  'sample_chat_1': [
+    {
+      id: '1',
+      text: '안녕하세요! 캠핑 텐트 대여 문의드립니다.',
+      isMe: true,
+      timestamp: '14:30',
+    },
+    {
+      id: '2',
+      text: '안녕하세요! 언제 사용하실 예정이신가요?',
+      isMe: false,
+      timestamp: '14:32',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+    },
+    {
+      id: '3',
+      text: '이번 주말 1박2일로 사용하고 싶습니다.',
+      isMe: true,
+      timestamp: '14:33',
+    },
+    {
+      id: '4',
+      text: '네, 가능합니다! 내일 오후 3시에 만날까요?',
+      isMe: false,
+      timestamp: '14:35',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+    },
+  ],
+  'sample_chat_2': [
+    {
+      id: '1',
+      text: '전동드릴 대여 가능한가요?',
+      isMe: true,
+      timestamp: '11:15',
+    },
+    {
+      id: '2',
+      text: '네, 가능합니다! 언제 필요하신가요?',
+      isMe: false,
+      timestamp: '11:18',
+      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
+    },
+    {
+      id: '3',
+      text: '내일부터 3일간 사용하고 싶어요.',
+      isMe: true,
+      timestamp: '11:20',
+    },
+    {
+      id: '4',
+      text: '전동드릴 사용법 알려주세요',
+      isMe: true,
+      timestamp: '11:22',
+    },
+  ],
+};
 
-const SAMPLE_CHAT_ROOM: ChatRoomData = {
-  id: '1',
-  otherUser: {
-    name: '민수님',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+// 채팅방별 데이터
+const CHAT_ROOM_DATA: { [key: string]: ChatRoomData } = {
+  'sample_chat_1': {
+    id: 'sample_chat_1',
+    otherUser: {
+      name: '민수님',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+    },
+    itemTitle: '캠핑 텐트 대여',
+    itemImage: 'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=100',
+    isRenting: true, // QR 계약 체결됨
   },
-  itemTitle: '캠핑 텐트 대여',
-  itemImage: 'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=100',
+  'sample_chat_2': {
+    id: 'sample_chat_2',
+    otherUser: {
+      name: '영희님',
+      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
+    },
+    itemTitle: '전동드릴 대여',
+    itemImage: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=100',
+    isRenting: false,
+  },
 };
 
 export default function ChatRoomScreen() {
@@ -80,26 +125,38 @@ export default function ChatRoomScreen() {
   const { id, postId, ownerId, ownerName, ownerAvatar, itemTitle, itemImage } = params;
   const router = useRouter();
   const { currentUser } = useUser();
-  const [messages, setMessages] = useState<Message[]>(SAMPLE_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
-  const [chatRoom, setChatRoom] = useState<ChatRoomData>(SAMPLE_CHAT_ROOM);
+  const [chatRoom, setChatRoom] = useState<ChatRoomData | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
+    const chatId = id as string;
+    
     // 파라미터가 있으면 새로운 채팅방 정보로 설정
     if (ownerName && ownerAvatar && itemTitle && itemImage) {
       setChatRoom({
-        id: id as string,
+        id: chatId,
         otherUser: {
           name: ownerName as string,
           avatar: ownerAvatar as string,
         },
         itemTitle: itemTitle as string,
         itemImage: itemImage as string,
+        isRenting: false,
       });
       
       // 새로운 채팅방이면 빈 메시지 목록으로 시작
       setMessages([]);
+    } else {
+      // 기존 채팅방 데이터 로드
+      const existingChatRoom = CHAT_ROOM_DATA[chatId];
+      const existingMessages = CHAT_MESSAGES[chatId] || [];
+      
+      if (existingChatRoom) {
+        setChatRoom(existingChatRoom);
+        setMessages(existingMessages);
+      }
     }
   }, [id, ownerName, ownerAvatar, itemTitle, itemImage]);
 
@@ -127,22 +184,38 @@ export default function ChatRoomScreen() {
   };
 
   const handleQRPayment = () => {
-    router.push({
-      pathname: '/qr-payment',
-      params: {
-        postId: postId,
-        itemTitle: itemTitle,
-        itemImage: itemImage,
-        ownerName: ownerName,
-        chatRoomId: id,
-      }
-    });
+    if (chatRoom?.isRenting) {
+      // 대여 중이면 QR 반납 페이지로
+      router.push({
+        pathname: '/qr-return',
+        params: {
+          postId: postId,
+          itemTitle: chatRoom.itemTitle,
+          itemImage: chatRoom.itemImage,
+          ownerName: chatRoom.otherUser.name,
+          chatRoomId: id,
+        }
+      });
+    } else {
+      // 대여 전이면 QR 대여 페이지로
+      router.push({
+        pathname: '/qr-payment',
+        params: {
+          postId: postId,
+          itemTitle: chatRoom?.itemTitle || itemTitle,
+          itemImage: chatRoom?.itemImage || itemImage,
+          ownerName: chatRoom?.otherUser.name || ownerName,
+          chatRoomId: id,
+        }
+      });
+    }
   };
+
   const renderMessage = ({ item }: { item: Message }) => {
     return (
       <View style={[styles.messageContainer, item.isMe ? styles.myMessage : styles.otherMessage]}>
         {!item.isMe && (
-          <Image source={{ uri: item.avatar || chatRoom.otherUser.avatar }} style={styles.messageAvatar} />
+          <Image source={{ uri: item.avatar || chatRoom?.otherUser.avatar }} style={styles.messageAvatar} />
         )}
         <View style={[styles.messageBubble, item.isMe ? styles.myBubble : styles.otherBubble]}>
           <Text style={[styles.messageText, item.isMe ? styles.myMessageText : styles.otherMessageText]}>
@@ -156,6 +229,10 @@ export default function ChatRoomScreen() {
     );
   };
 
+  if (!chatRoom) {
+    return null; // 로딩 중
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* 헤더 */}
@@ -163,6 +240,11 @@ export default function ChatRoomScreen() {
         <BackButton />
         <View style={styles.headerInfo}>
           <Image source={{ uri: chatRoom.itemImage }} style={styles.headerItemImage} />
+          {chatRoom.isRenting && (
+            <View style={styles.rentingBadge}>
+              <Text style={styles.rentingText}>대여중</Text>
+            </View>
+          )}
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>{chatRoom.otherUser.name}</Text>
             <Text style={styles.headerSubtitle}>{chatRoom.itemTitle}</Text>
@@ -192,7 +274,10 @@ export default function ChatRoomScreen() {
             style={styles.qrButton}
             onPress={handleQRPayment}
           >
-            <QrCode size={20} color={ComponentColors.button.primary} />
+            <QrCode 
+              size={20} 
+              color={chatRoom.isRenting ? '#EF4444' : ComponentColors.button.primary} 
+            />
           </TouchableOpacity>
           <TextInput
             style={styles.textInput}
@@ -243,6 +328,21 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 6,
     marginRight: 8,
+  },
+  rentingBadge: {
+    position: 'absolute',
+    top: -4,
+    right: 4,
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    zIndex: 1,
+  },
+  rentingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'white',
   },
   headerText: {
     flex: 1,
