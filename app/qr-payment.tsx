@@ -193,36 +193,76 @@ export default function QRPaymentScreen() {
 
   // 전자서명 단계 (양쪽 모두)
   const renderSignatureStep = () => (
-    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
+    <View style={styles.signatureStepContainer}>
       <Text style={styles.stepTitle}>전자서명</Text>
       <Text style={styles.stepSubtitle}>대여 계약서에 서명해주세요</Text>
       
-      <View style={styles.contractSummary}>
-        <Text style={styles.contractTitle}>📋 대여 계약서</Text>
-        <View style={styles.contractDetails}>
-          <Text style={styles.contractItem}>물건: {rentalData.itemTitle}</Text>
-          <Text style={styles.contractItem}>반납일: {rentalData.returnDate}</Text>
-          <Text style={styles.contractItem}>임대자: {rentalData.ownerName}</Text>
+      <ScrollView style={styles.contractScrollView}>
+        <View style={styles.contractSummary}>
+          <Text style={styles.contractTitle}>📋 대여 계약서</Text>
+          <View style={styles.contractDetails}>
+            <Text style={styles.contractItem}>• 대여 물품: {rentalData.itemTitle}</Text>
+            <Text style={styles.contractItem}>• 대여자: {rentalData.ownerName}</Text>
+            <Text style={styles.contractItem}>• 반납 예정일: {rentalData.returnDate}</Text>
+            <Text style={styles.contractItem}>• 총 대여료: 15,000원/일</Text>
+          </View>
+          
+          <View style={styles.agreementBox}>
+            <Text style={styles.agreementTitle}>📌 대여 약관 및 조건</Text>
+            <Text style={styles.agreementText}>
+              1. 대여료 및 결제{'\n'}
+              • 대여료는 안전거래 시스템을 통해 홀딩됩니다{'\n'}
+              • 반납 완료 확인 후 대여자에게 자동 정산됩니다{'\n'}
+              • 추가 비용 발생 시 별도 정산이 진행됩니다{'\n\n'}
+              
+              2. 반납 및 연체{'\n'}
+              • 약속된 반납일까지 반드시 반납해야 합니다{'\n'}
+              • 반납 지연 시 일일 연체료가 자동 부과됩니다{'\n'}
+              • 3일 이상 연체 시 분실로 간주될 수 있습니다{'\n\n'}
+              
+              3. 손상 및 분실{'\n'}
+              • 정상적인 사용으로 인한 마모는 인정됩니다{'\n'}
+              • 고의적 손상이나 분실 시 시세 기준으로 보상합니다{'\n'}
+              • 수리 가능한 손상은 수리비만 청구됩니다{'\n\n'}
+              
+              4. 기타 사항{'\n'}
+              • 본 계약은 전자서명으로 법적 효력을 갖습니다{'\n'}
+              • 분쟁 발생 시 플랫폼 중재를 통해 해결합니다{'\n'}
+              • 약관 위반 시 향후 서비스 이용이 제한될 수 있습니다
+            </Text>
+          </View>
         </View>
+      </ScrollView>
+      
+      <View style={styles.signatureSection}>
+        <Text style={styles.signatureSectionTitle}>전자서명</Text>
+        <Text style={styles.signatureSectionSubtitle}>
+          위 약관에 동의하며 아래에 서명해주세요
+        </Text>
         
-        <View style={styles.agreementBox}>
-          <Text style={styles.agreementTitle}>📌 계약 조건 동의</Text>
-          <Text style={styles.agreementText}>
-            • 대여료는 안전거래로 홀딩됩니다{'\n'}
-            • 반납 지연 시 연체료가 자동 부과됩니다{'\n'}
-            • 파손 시 게시글 명시 금액으로 보상합니다{'\n'}
-            • 전자서명으로 법적 효력이 발생합니다
-          </Text>
-        </View>
+        <TouchableOpacity 
+          style={styles.signatureButton} 
+          onPress={() => setShowSignature(true)}
+        >
+          <FileText size={20} color={Colors.primary} />
+          <Text style={styles.signatureButtonText}>서명하기</Text>
+        </TouchableOpacity>
+        
+        {signatureSvg ? (
+          <View style={styles.signaturePreview}>
+            <Text style={styles.signaturePreviewText}>✓ 서명 완료</Text>
+          </View>
+        ) : null}
       </View>
-
-      <TouchableOpacity 
-        style={styles.signatureButton} 
-        onPress={() => setShowSignature(true)}
-      >
-        <FileText size={20} color={Colors.primary} />
-        <Text style={styles.signatureButtonText}>전자서명 하기</Text>
-      </TouchableOpacity>
+      
+      {signatureSvg && (
+        <TouchableOpacity 
+          style={styles.primaryButton} 
+          onPress={() => setStep('complete')}
+        >
+          <Text style={styles.primaryButtonText}>계약 완료</Text>
+        </TouchableOpacity>
+      )}
 
       <Modal visible={showSignature} animationType="slide">
         <SafeAreaView style={styles.signatureModal} edges={['top', 'bottom']}>
@@ -273,7 +313,6 @@ export default function QRPaymentScreen() {
           <TouchableOpacity 
             style={styles.confirmSignatureButton}
             onPress={() => {
-              // 서명이 있는지 확인하고 바로 완료 페이지로 이동
               setShowSignature(false);
               setTimeout(() => {
                 setStep('complete');
@@ -284,6 +323,41 @@ export default function QRPaymentScreen() {
           </TouchableOpacity>
         </SafeAreaView>
       </Modal>
+    </View>
+  );
+
+  // 완료 단계
+  const renderCompleteStep = () => (
+    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
+      <View style={styles.successContainer}>
+        <View style={styles.successIcon}>
+          <Check size={40} color="white" />
+        </View>
+        <Text style={styles.successTitle}>계약 체결 완료!</Text>
+        <Text style={styles.successSubtitle}>
+          전자서명이 완료되어 대여 계약이 성공적으로 체결되었습니다
+        </Text>
+      </View>
+
+      <View style={styles.completeSummary}>
+        <Text style={styles.summaryTitle}>✅ 계약 정보</Text>
+        <View style={styles.summaryDetails}>
+          <Text style={styles.summaryItem}>물건: {rentalData.itemTitle}</Text>
+          <Text style={styles.summaryItem}>반납일: {rentalData.returnDate}</Text>
+          <Text style={styles.summaryItem}>총 대여료: 15,000원/일</Text>
+        </View>
+        
+        <View style={styles.paymentInfo}>
+          <Text style={styles.paymentTitle}>💳 안전거래 홀딩</Text>
+          <Text style={styles.paymentText}>• 대여료가 안전거래로 홀딩되었습니다</Text>
+          <Text style={styles.paymentText}>• 반납 완료 시 자동 정산됩니다</Text>
+          <Text style={styles.paymentText}>• 연체료는 반납 시 추가 정산됩니다</Text>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
+        <Text style={styles.primaryButtonText}>닫기</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 
@@ -569,12 +643,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  contractSummary: {
+  signatureStepContainer: {
     flex: 1,
+    padding: 16,
+  },
+  contractScrollView: {
+    flex: 1,
+    marginBottom: 16,
+  },
+  contractSummary: {
     backgroundColor: '#F9FAFB',
     padding: 20,
     borderRadius: 12,
-    marginBottom: 24,
   },
   contractTitle: {
     fontSize: 18,
@@ -610,6 +690,23 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     lineHeight: 18,
   },
+  signatureSection: {
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  signatureSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  signatureSectionSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 16,
+  },
   signatureButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -619,13 +716,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: Colors.primaryBorder,
-    marginBottom: 20,
+    cursor: 'pointer',
   },
   signatureButtonText: {
     fontSize: 16,
     fontWeight: '500',
     color: Colors.primaryDark,
     marginLeft: 8,
+  },
+  signaturePreview: {
+    backgroundColor: '#F0FDF4',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  signaturePreviewText: {
+    fontSize: 14,
+    color: '#15803D',
+    fontWeight: '500',
   },
   signatureModal: {
     flex: 1,
