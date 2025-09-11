@@ -361,40 +361,6 @@ export default function QRPaymentScreen() {
     </ScrollView>
   );
 
-  // 완료 단계
-  const renderCompleteStep = () => (
-    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
-      <View style={styles.successContainer}>
-        <View style={styles.successIcon}>
-          <Check size={40} color="white" />
-        </View>
-        <Text style={styles.successTitle}>계약 체결 완료!</Text>
-        <Text style={styles.successSubtitle}>
-          전자서명이 완료되어 대여 계약이 성공적으로 체결되었습니다
-        </Text>
-      </View>
-
-      <View style={styles.completeSummary}>
-        <Text style={styles.summaryTitle}>✅ 계약 정보</Text>
-        <View style={styles.summaryDetails}>
-          <Text style={styles.summaryItem}>물건: {rentalData.itemTitle}</Text>
-          <Text style={styles.summaryItem}>반납일: {rentalData.returnDate}</Text>
-        </View>
-        
-        <View style={styles.paymentInfo}>
-          <Text style={styles.paymentTitle}>💳 안전거래 홀딩</Text>
-          <Text style={styles.paymentText}>• 대여료가 안전거래로 홀딩되었습니다</Text>
-          <Text style={styles.paymentText}>• 반납 완료 시 자동 정산됩니다</Text>
-          <Text style={styles.paymentText}>• 연체료는 반납 시 추가 정산됩니다</Text>
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
-        <Text style={styles.primaryButtonText}>닫기</Text>
-      </TouchableOpacity>
-    </ScrollView>
-  );
-
   const getCurrentStepContent = () => {
     switch (step) {
       case 'qr-generate':
