@@ -427,6 +427,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 4,
+    cursor: 'pointer',
   },
   headerTitle: {
     flex: 1,
