@@ -109,19 +109,8 @@ export default function QRPaymentScreen() {
 
   // 완료
   const handleComplete = () => {
-    Alert.alert(
-      '완료',
-      '메인 페이지로 이동합니다.',
-      [
-        {
-          text: '확인',
-          onPress: () => {
-            // 메인 페이지(홈 탭)로 이동
-            router.replace('/(tabs)');
-          },
-        },
-      ]
-    );
+    // 메인 페이지(홈 탭)로 이동
+    router.push('/(tabs)');
   };
 
   // QR 생성 조건 입력 단계 (판매자)
