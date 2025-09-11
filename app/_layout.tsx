@@ -19,6 +19,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="splash" />
           <Stack.Screen name="login" />
+          <Stack.Screen name="signup" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="post/[id]" />
           <Stack.Screen name="chat-room/[id]" />

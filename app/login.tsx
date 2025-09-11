@@ -43,13 +43,16 @@ export default function LoginScreen() {
 
           {/* 소셜 로그인 버튼들 */}
           <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton} onPress={handleLogin}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => router.push('/signup')}
+            >
               <Text style={styles.socialButtonText}>📱 카카오톡으로 시작</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.socialButton, styles.googleButton]}
-              onPress={handleLogin}
+              onPress={() => router.push('/signup')}
             >
               <Text style={styles.socialButtonText}>🌐 구글로 시작</Text>
             </TouchableOpacity>
