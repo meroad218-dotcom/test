@@ -110,18 +110,14 @@ export default function QRPaymentScreen() {
   // 완료
   const handleComplete = () => {
     Alert.alert(
-      '대여 계약 완료',
-      '전자서명이 완료되어 대여 계약이 체결되었습니다.\n대여료가 안전거래로 홀딩되었습니다.',
+      '완료',
+      '메인 페이지로 이동합니다.',
       [
         {
           text: '확인',
           onPress: () => {
-            // 채팅방으로 돌아가기
-            if (chatRoomId) {
-              router.replace(`/chat-room/${chatRoomId}`);
-            } else {
-              router.replace('/(tabs)/chat');
-            }
+            // 메인 페이지(홈 탭)로 이동
+            router.replace('/(tabs)');
           },
         },
       ]
@@ -354,7 +350,7 @@ export default function QRPaymentScreen() {
       </View>
 
       <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
-        <Text style={styles.primaryButtonText}>완료</Text>
+        <Text style={styles.primaryButtonText}>닫기</Text>
       </TouchableOpacity>
     </ScrollView>
   );
