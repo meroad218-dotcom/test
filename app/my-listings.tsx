@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Eye, MessageCircle, Edit3, Trash2, Calendar } from 'lucide-react-native';
+import { Eye, MessageCircle, CreditCard as Edit3, Trash2, Calendar } from 'lucide-react-native';
 import Colors from '@/constants/Theme';
 import BackButton from '@/components/BackButton';
 
