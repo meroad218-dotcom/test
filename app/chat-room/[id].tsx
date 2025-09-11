@@ -130,28 +130,16 @@ export default function ChatRoomScreen() {
   };
 
   const handleQRPayment = () => {
-    Alert.alert(
-      'QR 결제',
-      '대여 계약을 진행하시겠습니까?',
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '진행',
-          onPress: () => {
-            router.push({
-              pathname: '/qr-payment',
-              params: {
-                postId: postId,
-                itemTitle: itemTitle,
-                itemImage: itemImage,
-                ownerName: ownerName,
-                chatRoomId: id,
-              }
-            });
-          },
-        },
-      ]
-    );
+    router.push({
+      pathname: '/qr-payment',
+      params: {
+        postId: postId,
+        itemTitle: itemTitle,
+        itemImage: itemImage,
+        ownerName: ownerName,
+        chatRoomId: id,
+      }
+    });
   };
   const renderMessage = ({ item }: { item: Message }) => {
     return (
