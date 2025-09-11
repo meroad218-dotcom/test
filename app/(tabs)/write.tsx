@@ -96,7 +96,7 @@ export default function WriteScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>대여 글쓰기</Text>
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>

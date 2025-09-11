@@ -176,7 +176,7 @@ export default function QRPaymentScreen() {
       </TouchableOpacity>
 
       <Modal visible={showSignature} animationType="slide">
-        <SafeAreaView style={styles.signatureModal}>
+        <SafeAreaView style={styles.signatureModal} edges={['top', 'bottom']}>
           <View style={styles.signatureHeader}>
             <TouchableOpacity 
               onPress={() => setShowSignature(false)}
@@ -273,7 +273,7 @@ export default function QRPaymentScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>QR 결제</Text>
       </View>

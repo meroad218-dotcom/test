@@ -120,7 +120,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <View style={styles.locationContainer}>
           <MapPin size={16} color={Colors.primary} />
