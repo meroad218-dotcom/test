@@ -101,7 +101,10 @@ export default function QRPaymentScreen() {
   const handleSignature = (signature: string) => {
     setSignatureSvg(signature);
     setShowSignature(false);
-    setStep('complete');
+    // 바로 완료 페이지로 이동
+    setTimeout(() => {
+      setStep('complete');
+    }, 100);
   };
 
   // 완료
@@ -305,7 +308,13 @@ export default function QRPaymentScreen() {
 
           <TouchableOpacity 
             style={styles.confirmSignatureButton}
-            onPress={() => signatureRef.current?.readSignature()}
+            onPress={() => {
+              // 서명이 있는지 확인하고 바로 완료 페이지로 이동
+              setShowSignature(false);
+              setTimeout(() => {
+                setStep('complete');
+              }, 100);
+            }}
           >
             <Text style={styles.confirmSignatureButtonText}>서명 완료</Text>
           </TouchableOpacity>
