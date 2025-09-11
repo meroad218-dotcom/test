@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { User, CreditCard, Settings, CircleHelp as HelpCircle, Star, ChevronRight, MapPin, Clock } from 'lucide-react-native';
 import { useUser } from '@/hooks/UserContext';
 import Colors from '@/constants/Theme';
@@ -20,6 +21,18 @@ const MENU_ITEMS = [
     title: '계좌 정보',
     icon: CreditCard,
     color: Colors.primary,
+  },
+  {
+    id: 'my-rentals',
+    title: '내가 대여 중',
+    icon: User,
+    color: '#6B7280',
+  },
+  {
+    id: 'my-listings',
+    title: '내가 판매 중',
+    icon: User,
+    color: '#6B7280',
   },
   {
     id: 'settings',
@@ -37,14 +50,18 @@ const MENU_ITEMS = [
 
 export default function ProfileScreen() {
   const { currentUser: user } = useUser();
+  const router = useRouter();
 
   const handleMenuPress = (menuId: string) => {
     switch (menuId) {
       case 'account':
-        Alert.alert(
-          '계좌 정보', 
-          `등록된 계좌번호:\n${user.accountNumber}\n\n대여료 입금용으로 사용됩니다.`
-        );
+        router.push('/account-history');
+        break;
+      case 'my-rentals':
+        router.push('/my-rentals');
+        break;
+      case 'my-listings':
+        router.push('/my-listings');
         break;
       case 'settings':
         Alert.alert('설정', '설정 화면으로 이동합니다.');
