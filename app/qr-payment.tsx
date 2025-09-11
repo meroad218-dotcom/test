@@ -52,6 +52,7 @@ export default function QRPaymentScreen() {
   const signatureRef = useRef<any>(null);
 
   const handleBack = () => {
+    console.log('Back button pressed');
     router.back();
   };
 
