@@ -51,7 +51,11 @@ export default function QRPaymentScreen() {
   const signatureRef = useRef<any>(null);
 
   const handleBack = () => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/chat');
+    }
   };
 
   // 1단계: QR 생성 조건 입력 (판매자)
@@ -75,6 +79,20 @@ export default function QRPaymentScreen() {
     const mockToken = btoa(JSON.stringify(mockJWTPayload));
     setQrToken(mockToken);
     setTokenExpiry(180); // 3분 = 180초
+    
+    // 타이머 시작
+    const timer = setInterval(() => {
+      setTokenExpiry(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          Alert.alert('QR 만료', 'QR 코드가 만료되었습니다. 새로 생성해주세요.');
+          setStep('qr-generate');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
     setStep('qr-display');
   };
 
