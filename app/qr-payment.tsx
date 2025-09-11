@@ -104,11 +104,6 @@ export default function QRPaymentScreen() {
   const handleSignature = (signature: string) => {
     setSignatureSvg(signature);
     setShowSignature(false);
-    
-    // 실제로는 서버에 전자서명 제출 API 호출
-    // POST /rentals/{id}/sign
-    // Body: { signatureKey, termsVersion, idempotencyKey }
-    
     setStep('complete');
   };
 
