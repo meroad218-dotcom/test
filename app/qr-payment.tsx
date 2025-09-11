@@ -52,7 +52,7 @@ export default function QRPaymentScreen() {
   const signatureRef = useRef<any>(null);
 
   const handleBack = () => {
-    router.back();
+    router.goBack();
   };
 
   // 1단계: QR 생성 조건 입력 (판매자)
