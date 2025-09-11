@@ -9,10 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Send } from 'lucide-react-native';
+import { ArrowLeft, Send, QrCode } from 'lucide-react-native';
 import { useUser } from '@/hooks/UserContext';
 import { ComponentColors } from '@/constants/Theme';
 
@@ -128,6 +129,30 @@ export default function ChatRoomScreen() {
     }, 100);
   };
 
+  const handleQRPayment = () => {
+    Alert.alert(
+      'QR 결제',
+      '대여 계약을 진행하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '진행',
+          onPress: () => {
+            router.push({
+              pathname: '/qr-payment',
+              params: {
+                postId: postId,
+                itemTitle: itemTitle,
+                itemImage: itemImage,
+                ownerName: ownerName,
+                chatRoomId: id,
+              }
+            });
+          },
+        },
+      ]
+    );
+  };
   const renderMessage = ({ item }: { item: Message }) => {
     return (
       <View style={[styles.messageContainer, item.isMe ? styles.myMessage : styles.otherMessage]}>
@@ -180,6 +205,12 @@ export default function ChatRoomScreen() {
 
         {/* 입력창 */}
         <View style={styles.inputContainer}>
+          <TouchableOpacity 
+            style={styles.qrButton}
+            onPress={handleQRPayment}
+          >
+            <QrCode size={20} color={ComponentColors.button.primary} />
+          </TouchableOpacity>
           <TextInput
             style={styles.textInput}
             value={inputText}
@@ -324,6 +355,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
+  },
+  qrButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    marginRight: 8,
   },
   textInput: {
     flex: 1,
