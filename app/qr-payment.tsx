@@ -54,8 +54,8 @@ export default function QRPaymentScreen() {
 
   // 1단계: QR 생성 조건 입력 (판매자)
   const handleGenerateQR = () => {
-    if (!rentalData.rentalFee || !rentalData.returnDate || !rentalData.lateFee) {
-      Alert.alert('알림', '모든 대여 조건을 입력해주세요.');
+    if (!rentalData.returnDate) {
+      Alert.alert('알림', '반납 예정일을 입력해주세요.');
       return;
     }
 
@@ -138,20 +138,6 @@ export default function QRPaymentScreen() {
       <View style={styles.form}>
         <View style={styles.inputGroup}>
           <View style={styles.labelContainer}>
-            <DollarSign size={16} color={Colors.primary} />
-            <Text style={styles.label}>대여료 (원/일) *</Text>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="예: 15000"
-            value={rentalData.rentalFee}
-            onChangeText={(text) => setRentalData(prev => ({ ...prev, rentalFee: text }))}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
             <Calendar size={16} color={Colors.primary} />
             <Text style={styles.label}>반납 예정일 *</Text>
           </View>
@@ -160,20 +146,6 @@ export default function QRPaymentScreen() {
             placeholder="예: 2024-01-20"
             value={rentalData.returnDate}
             onChangeText={(text) => setRentalData(prev => ({ ...prev, returnDate: text }))}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <DollarSign size={16} color={Colors.warning} />
-            <Text style={styles.label}>연체료 (원/일) *</Text>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="예: 5000"
-            value={rentalData.lateFee}
-            onChangeText={(text) => setRentalData(prev => ({ ...prev, lateFee: text }))}
-            keyboardType="numeric"
           />
         </View>
       </View>
@@ -204,9 +176,7 @@ export default function QRPaymentScreen() {
         
         <View style={styles.rentalSummary}>
           <Text style={styles.summaryTitle}>설정된 대여 조건</Text>
-          <Text style={styles.summaryItem}>• 대여료: {rentalData.rentalFee}원/일</Text>
           <Text style={styles.summaryItem}>• 반납일: {rentalData.returnDate}</Text>
-          <Text style={styles.summaryItem}>• 연체료: {rentalData.lateFee}원/일</Text>
         </View>
       </View>
       
@@ -231,9 +201,7 @@ export default function QRPaymentScreen() {
         <Text style={styles.contractTitle}>📋 대여 계약서</Text>
         <View style={styles.contractDetails}>
           <Text style={styles.contractItem}>물건: {rentalData.itemTitle}</Text>
-          <Text style={styles.contractItem}>대여료: {rentalData.rentalFee}원/일</Text>
           <Text style={styles.contractItem}>반납일: {rentalData.returnDate}</Text>
-          <Text style={styles.contractItem}>연체료: {rentalData.lateFee}원/일</Text>
           <Text style={styles.contractItem}>임대자: {rentalData.ownerName}</Text>
         </View>
         
@@ -336,9 +304,7 @@ export default function QRPaymentScreen() {
         <Text style={styles.summaryTitle}>✅ 계약 정보</Text>
         <View style={styles.summaryDetails}>
           <Text style={styles.summaryItem}>물건: {rentalData.itemTitle}</Text>
-          <Text style={styles.summaryItem}>대여료: {rentalData.rentalFee}원/일</Text>
           <Text style={styles.summaryItem}>반납일: {rentalData.returnDate}</Text>
-          <Text style={styles.summaryItem}>연체료: {rentalData.lateFee}원/일</Text>
         </View>
         
         <View style={styles.paymentInfo}>
