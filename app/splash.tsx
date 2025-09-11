@@ -25,9 +25,9 @@ export default function SplashScreen() {
       }),
     ]).start();
 
-    // 3초 후 메인 화면으로 이동
+    // 3초 후 로그인 화면으로 이동
     const timer = setTimeout(() => {
-      router.replace('/(tabs)');
+      router.replace('/login');
     }, 3000);
 
     return () => clearTimeout(timer);

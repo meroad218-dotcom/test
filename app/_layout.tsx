@@ -16,7 +16,9 @@ export default function RootLayout() {
             headerShown: false,
           }}
         >
+          <Stack.Screen name="index" />
           <Stack.Screen name="splash" />
+          <Stack.Screen name="login" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="post/[id]" />
           <Stack.Screen name="chat-room/[id]" />
