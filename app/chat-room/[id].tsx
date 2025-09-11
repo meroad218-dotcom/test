@@ -39,7 +39,7 @@ interface ChatRoomData {
 
 // 채팅방별 메시지 데이터
 const CHAT_MESSAGES: { [key: string]: Message[] } = {
-  'sample_chat_1': [
+  sample_chat_1: [
     {
       id: '1',
       text: '안녕하세요! 캠핑 텐트 대여 문의드립니다.',
@@ -51,7 +51,8 @@ const CHAT_MESSAGES: { [key: string]: Message[] } = {
       text: '안녕하세요! 언제 사용하실 예정이신가요?',
       isMe: false,
       timestamp: '14:32',
-      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+      avatar:
+        'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
     },
     {
       id: '3',
@@ -64,10 +65,11 @@ const CHAT_MESSAGES: { [key: string]: Message[] } = {
       text: '네, 가능합니다! 내일 오후 3시에 만날까요?',
       isMe: false,
       timestamp: '14:35',
-      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+      avatar:
+        'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
     },
   ],
-  'sample_chat_2': [
+  sample_chat_2: [
     {
       id: '1',
       text: '전동드릴 대여 가능한가요?',
@@ -79,7 +81,8 @@ const CHAT_MESSAGES: { [key: string]: Message[] } = {
       text: '네, 가능합니다! 언제 필요하신가요?',
       isMe: false,
       timestamp: '11:18',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
+      avatar:
+        'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
     },
     {
       id: '3',
@@ -98,31 +101,36 @@ const CHAT_MESSAGES: { [key: string]: Message[] } = {
 
 // 채팅방별 데이터
 const CHAT_ROOM_DATA: { [key: string]: ChatRoomData } = {
-  'sample_chat_1': {
+  sample_chat_1: {
     id: 'sample_chat_1',
     otherUser: {
       name: '민수님',
-      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+      avatar:
+        'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
     },
     itemTitle: '캠핑 텐트 대여',
-    itemImage: 'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=100',
+    itemImage:
+      'https://images.pexels.com/photos/699558/pexels-photo-699558.jpeg?auto=compress&cs=tinysrgb&w=100',
     isRenting: false,
   },
-  'sample_chat_2': {
+  sample_chat_2: {
     id: 'sample_chat_2',
     otherUser: {
       name: '영희님',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
+      avatar:
+        'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
     },
     itemTitle: '전동드릴 대여',
-    itemImage: 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=100',
+    itemImage:
+      'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=100',
     isRenting: true,
   },
 };
 
 export default function ChatRoomScreen() {
   const params = useLocalSearchParams();
-  const { id, postId, ownerId, ownerName, ownerAvatar, itemTitle, itemImage } = params;
+  const { id, postId, ownerId, ownerName, ownerAvatar, itemTitle, itemImage } =
+    params;
   const router = useRouter();
   const { currentUser } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -132,7 +140,7 @@ export default function ChatRoomScreen() {
 
   useEffect(() => {
     const chatId = id as string;
-    
+
     // 파라미터가 있으면 새로운 채팅방 정보로 설정
     if (ownerName && ownerAvatar && itemTitle && itemImage) {
       setChatRoom({
@@ -145,14 +153,14 @@ export default function ChatRoomScreen() {
         itemImage: itemImage as string,
         isRenting: false,
       });
-      
+
       // 새로운 채팅방이면 빈 메시지 목록으로 시작
       setMessages([]);
     } else {
       // 기존 채팅방 데이터 로드
       const existingChatRoom = CHAT_ROOM_DATA[chatId];
       const existingMessages = CHAT_MESSAGES[chatId] || [];
-      
+
       if (existingChatRoom) {
         setChatRoom(existingChatRoom);
         setMessages(existingMessages);
@@ -194,7 +202,7 @@ export default function ChatRoomScreen() {
           itemImage: chatRoom.itemImage,
           ownerName: chatRoom.otherUser.name,
           chatRoomId: id,
-        }
+        },
       });
     } else {
       // 대여 전이면 QR 대여 페이지로
@@ -206,22 +214,45 @@ export default function ChatRoomScreen() {
           itemImage: chatRoom?.itemImage || itemImage,
           ownerName: chatRoom?.otherUser.name || ownerName,
           chatRoomId: id,
-        }
+        },
       });
     }
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
     return (
-      <View style={[styles.messageContainer, item.isMe ? styles.myMessage : styles.otherMessage]}>
+      <View
+        style={[
+          styles.messageContainer,
+          item.isMe ? styles.myMessage : styles.otherMessage,
+        ]}
+      >
         {!item.isMe && (
-          <Image source={{ uri: item.avatar || chatRoom?.otherUser.avatar }} style={styles.messageAvatar} />
+          <Image
+            source={{ uri: item.avatar || chatRoom?.otherUser.avatar }}
+            style={styles.messageAvatar}
+          />
         )}
-        <View style={[styles.messageBubble, item.isMe ? styles.myBubble : styles.otherBubble]}>
-          <Text style={[styles.messageText, item.isMe ? styles.myMessageText : styles.otherMessageText]}>
+        <View
+          style={[
+            styles.messageBubble,
+            item.isMe ? styles.myBubble : styles.otherBubble,
+          ]}
+        >
+          <Text
+            style={[
+              styles.messageText,
+              item.isMe ? styles.myMessageText : styles.otherMessageText,
+            ]}
+          >
             {item.text}
           </Text>
-          <Text style={[styles.messageTime, item.isMe ? styles.myMessageTime : styles.otherMessageTime]}>
+          <Text
+            style={[
+              styles.messageTime,
+              item.isMe ? styles.myMessageTime : styles.otherMessageTime,
+            ]}
+          >
             {item.timestamp}
           </Text>
         </View>
@@ -234,12 +265,15 @@ export default function ChatRoomScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* 헤더 */}
       <View style={styles.header}>
         <BackButton />
         <View style={styles.headerInfo}>
-          <Image source={{ uri: chatRoom.itemImage }} style={styles.headerItemImage} />
+          <Image
+            source={{ uri: chatRoom.itemImage }}
+            style={styles.headerItemImage}
+          />
           {chatRoom.isRenting && (
             <View style={styles.rentingBadge}>
               <Text style={styles.rentingText}>대여중</Text>
@@ -250,13 +284,17 @@ export default function ChatRoomScreen() {
             <Text style={styles.headerSubtitle}>{chatRoom.itemTitle}</Text>
           </View>
         </View>
-        <Image source={{ uri: chatRoom.otherUser.avatar }} style={styles.headerAvatar} />
+        <Image
+          source={{ uri: chatRoom.otherUser.avatar }}
+          style={styles.headerAvatar}
+        />
       </View>
 
       {/* 메시지 목록 */}
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={styles.contentContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <FlatList
           ref={flatListRef}
@@ -265,18 +303,19 @@ export default function ChatRoomScreen() {
           renderItem={renderMessage}
           style={styles.messagesList}
           contentContainerStyle={styles.messagesContent}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: true })
+          }
         />
 
         {/* 입력창 */}
         <View style={styles.inputContainer}>
-          <TouchableOpacity 
-            style={styles.qrButton}
-            onPress={handleQRPayment}
-          >
-            <QrCode 
-              size={20} 
-              color={chatRoom.isRenting ? '#EF4444' : ComponentColors.button.primary} 
+          <TouchableOpacity style={styles.qrButton} onPress={handleQRPayment}>
+            <QrCode
+              size={20}
+              color={
+                chatRoom.isRenting ? '#EF4444' : ComponentColors.button.primary
+              }
             />
           </TouchableOpacity>
           <TextInput
@@ -290,12 +329,17 @@ export default function ChatRoomScreen() {
             onSubmitEditing={handleSendMessage}
             blurOnSubmit={false}
           />
-          <TouchableOpacity 
-            style={[styles.sendButton, inputText.trim() ? styles.sendButtonActive : styles.sendButtonInactive]}
+          <TouchableOpacity
+            style={[
+              styles.sendButton,
+              inputText.trim()
+                ? styles.sendButtonActive
+                : styles.sendButtonInactive,
+            ]}
             onPress={handleSendMessage}
             disabled={!inputText.trim()}
           >
-            <Send size={20} color={inputText.trim() ? "white" : "#9CA3AF"} />
+            <Send size={20} color={inputText.trim() ? 'white' : '#9CA3AF'} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -432,6 +476,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingBottom: Platform.OS === 'android' ? 16 : 12,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
