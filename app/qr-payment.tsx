@@ -51,11 +51,7 @@ export default function QRPaymentScreen() {
   const signatureRef = useRef<any>(null);
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.push('/chat');
-    }
+    router.back();
   };
 
   // 1단계: QR 생성 조건 입력 (판매자)
@@ -162,7 +158,7 @@ export default function QRPaymentScreen() {
 
   // QR 생성 조건 입력 단계 (판매자)
   const renderQRGenerateStep = () => (
-    <View style={styles.stepContainer}>
+    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
       <Text style={styles.stepTitle}>대여 조건 설정</Text>
       <Text style={styles.stepSubtitle}>QR 코드 생성을 위한 대여 조건을 입력하세요</Text>
       
@@ -218,12 +214,12 @@ export default function QRPaymentScreen() {
         <QrCode size={20} color="white" />
         <Text style={styles.primaryButtonText}>QR 코드 생성</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 
   // QR 코드 표시 단계 (판매자)
   const renderQRDisplayStep = () => (
-    <View style={styles.stepContainer}>
+    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
       <Text style={styles.stepTitle}>QR 코드 생성 완료</Text>
       <Text style={styles.stepSubtitle}>대여자가 이 QR 코드를 스캔하면 대여가 시작됩니다</Text>
       
@@ -254,12 +250,12 @@ export default function QRPaymentScreen() {
           <Text style={styles.primaryButtonText}>QR 스캔 시뮬레이션</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 
   // 전자서명 단계 (양쪽 모두)
   const renderSignatureStep = () => (
-    <View style={styles.stepContainer}>
+    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
       <Text style={styles.stepTitle}>전자서명</Text>
       <Text style={styles.stepSubtitle}>대여 계약서에 서명해주세요</Text>
       
@@ -346,12 +342,12 @@ export default function QRPaymentScreen() {
           </TouchableOpacity>
         </SafeAreaView>
       </Modal>
-    </View>
+    </ScrollView>
   );
 
   // 완료 단계
   const renderCompleteStep = () => (
-    <View style={styles.stepContainer}>
+    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.stepContainer}>
       <View style={styles.successContainer}>
         <View style={styles.successIcon}>
           <Check size={40} color="white" />
@@ -382,7 +378,7 @@ export default function QRPaymentScreen() {
       <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
         <Text style={styles.primaryButtonText}>완료</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 
   const getCurrentStepContent = () => {
@@ -506,10 +502,13 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     textAlign: 'center',
   },
-  stepContainer: {
+  scrollContainer: {
     flex: 1,
+  },
+  stepContainer: {
+    flexGrow: 1,
     padding: 16,
-    justifyContent: 'space-between',
+    paddingBottom: 32,
   },
   stepTitle: {
     fontSize: 20,
@@ -539,7 +538,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   form: {
-    flex: 1,
+    marginBottom: 24,
   },
   inputGroup: {
     marginBottom: 20,
