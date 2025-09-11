@@ -95,38 +95,9 @@ export default function QRPaymentScreen() {
 
   // 2단계: QR 스캔 (구매자)
   const handleQRScan = () => {
-    try {
-      // QR 토큰 검증 시뮬레이션
-      const payload = JSON.parse(atob(qrToken));
-      const now = Math.floor(Date.now() / 1000);
-      
-      if (payload.exp < now) {
-        Alert.alert('오류', 'QR 코드가 만료되었습니다. 새로운 QR 코드를 요청해주세요.');
-        return;
-      }
-
-      if (payload.act !== 'PICKUP') {
-        Alert.alert('오류', '잘못된 QR 코드입니다.');
-        return;
-      }
-
-      // 토큰이 유효하면 전자서명 단계로 이동
-      Alert.alert(
-        'QR 스캔 완료',
-        '대여 조건을 확인했습니다.\n전자서명을 진행해주세요.',
-        [
-          {
-            text: '확인',
-            onPress: () => {
-              setUserRole('buyer');
-              setStep('signature');
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert('오류', '잘못된 QR 코드입니다.');
-    }
+    // QR 스캔 시뮬레이션 - 바로 전자서명 단계로 이동
+    setUserRole('buyer');
+    setStep('signature');
   };
 
   // 3단계: 전자서명 완료
