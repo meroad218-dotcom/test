@@ -18,6 +18,7 @@ interface RentalForm {
   description: string;
   price: string;
   period: string;
+  lateFee: string;
   category: string;
   images: string[];
 }
@@ -37,12 +38,13 @@ export default function WriteScreen() {
     description: '',
     price: '',
     period: '',
+    lateFee: '',
     category: '',
     images: [],
   });
 
   const handleSubmit = () => {
-    if (!form.title || !form.price || !form.period) {
+    if (!form.title || !form.price || !form.period || !form.lateFee) {
       Alert.alert('알림', '필수 항목을 모두 입력해주세요.');
       return;
     }
@@ -63,6 +65,7 @@ export default function WriteScreen() {
               description: '',
               price: '',
               period: '',
+              lateFee: '',
               category: '',
               images: [],
             });
@@ -191,6 +194,21 @@ export default function WriteScreen() {
             value={form.period}
             onChangeText={(text) => setForm(prev => ({ ...prev, period: text }))}
           />
+        </View>
+
+        {/* 연체료 */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>연체료 *</Text>
+          <View style={styles.priceInputContainer}>
+            <TextInput
+              style={styles.priceInput}
+              placeholder="0"
+              value={form.lateFee}
+              onChangeText={(text) => setForm(prev => ({ ...prev, lateFee: text }))}
+              keyboardType="numeric"
+            />
+            <Text style={styles.priceUnit}>원/일</Text>
+          </View>
         </View>
 
         {/* 설명 */}
