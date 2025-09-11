@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { QrCode, FileText, Check, ArrowLeft, Calendar, DollarSign } from 'lucide-react-native';
+import { QrCode, FileText, Check, ArrowLeft, Calendar, DollarSign, Clock } from 'lucide-react-native';
 import SignatureCapture from 'react-native-signature-canvas';
 import Colors from '@/constants/Theme';
 
-interface RentalData {
+interface RentalQRData {
+  itemId: string;
   itemTitle: string;
   itemImage: string;
   ownerName: string;
@@ -29,11 +30,15 @@ export default function QRPaymentScreen() {
   const { postId, itemTitle, itemImage, ownerName, chatRoomId } = params;
   const router = useRouter();
   
-  const [step, setStep] = useState<'qr-generate' | 'qr-scan' | 'form' | 'signature' | 'complete'>('qr-generate');
+  // 판매자인지 구매자인지 구분 (실제로는 사용자 정보로 판단)
+  const [userRole, setUserRole] = useState<'seller' | 'buyer'>('seller');
+  const [step, setStep] = useState<'qr-generate' | 'qr-display' | 'qr-scan' | 'signature' | 'complete'>('qr-generate');
   const [showSignature, setShowSignature] = useState(false);
   const [signatureSvg, setSignatureSvg] = useState<string>('');
   const [qrToken, setQrToken] = useState<string>('');
-  const [rentalData, setRentalData] = useState<RentalData>({
+  const [tokenExpiry, setTokenExpiry] = useState<number>(0);
+  const [rentalData, setRentalData] = useState<RentalQRData>({
+    itemId: postId as string || '1',
     itemTitle: itemTitle as string || '캠핑 텐트 대여 (4인용)',
     itemImage: itemImage as string || '',
     ownerName: ownerName as string || '김철수',
@@ -49,54 +54,83 @@ export default function QRPaymentScreen() {
     router.back();
   };
 
-  // 1단계: QR 생성 (판매자)
+  // 1단계: QR 생성 조건 입력 (판매자)
   const handleGenerateQR = () => {
     if (!rentalData.rentalFee || !rentalData.returnDate || !rentalData.lateFee) {
       Alert.alert('알림', '모든 대여 조건을 입력해주세요.');
       return;
     }
 
-    // 실제로는 서버에서 JWT 토큰 생성
-    const mockToken = `qr_token_${Date.now()}`;
+    // JWT 토큰 생성 시뮬레이션 (실제로는 서버 API 호출)
+    const mockJWTPayload = {
+      act: 'PICKUP',
+      itemId: rentalData.itemId,
+      returnDate: rentalData.returnDate,
+      lateFee: rentalData.lateFee,
+      rentalFee: rentalData.rentalFee,
+      exp: Math.floor(Date.now() / 1000) + 180, // 3분 후 만료
+      jti: `qr_${Date.now()}` // 고유 ID
+    };
+    
+    const mockToken = btoa(JSON.stringify(mockJWTPayload));
     setQrToken(mockToken);
-    setStep('qr-scan');
+    setTokenExpiry(180); // 3분 = 180초
+    setStep('qr-display');
   };
 
-  // 2단계: QR 스캔 (대여자)
+  // 2단계: QR 스캔 (구매자)
   const handleQRScan = () => {
-    Alert.alert(
-      'QR 스캔 완료',
-      '대여 정보를 확인했습니다.\n대여자 정보를 입력해주세요.',
-      [
-        {
-          text: '확인',
-          onPress: () => setStep('form'),
-        },
-      ]
-    );
-  };
+    try {
+      // QR 토큰 검증 시뮬레이션
+      const payload = JSON.parse(atob(qrToken));
+      const now = Math.floor(Date.now() / 1000);
+      
+      if (payload.exp < now) {
+        Alert.alert('오류', 'QR 코드가 만료되었습니다. 새로운 QR 코드를 요청해주세요.');
+        return;
+      }
 
-  // 3단계: 대여자 정보 입력
-  const handleFormSubmit = () => {
-    if (!rentalData.renterName) {
-      Alert.alert('알림', '대여자명을 입력해주세요.');
-      return;
+      if (payload.act !== 'PICKUP') {
+        Alert.alert('오류', '잘못된 QR 코드입니다.');
+        return;
+      }
+
+      // 토큰이 유효하면 전자서명 단계로 이동
+      Alert.alert(
+        'QR 스캔 완료',
+        '대여 조건을 확인했습니다.\n전자서명을 진행해주세요.',
+        [
+          {
+            text: '확인',
+            onPress: () => {
+              setUserRole('buyer');
+              setStep('signature');
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('오류', '잘못된 QR 코드입니다.');
     }
-    setStep('signature');
   };
 
-  // 4단계: 전자서명
+  // 3단계: 전자서명 완료
   const handleSignature = (signature: string) => {
     setSignatureSvg(signature);
     setShowSignature(false);
+    
+    // 실제로는 서버에 전자서명 제출 API 호출
+    // POST /rentals/{id}/sign
+    // Body: { signatureKey, termsVersion, idempotencyKey }
+    
     setStep('complete');
   };
 
-  // 5단계: 완료
+  // 완료
   const handleComplete = () => {
     Alert.alert(
       '대여 계약 완료',
-      '대여 계약이 성공적으로 체결되었습니다.\n대여료가 홀딩되었으며, 반납 시 정산됩니다.',
+      '전자서명이 완료되어 대여 계약이 체결되었습니다.\n대여료가 안전거래로 홀딩되었습니다.',
       [
         {
           text: '확인',
@@ -108,16 +142,15 @@ export default function QRPaymentScreen() {
     );
   };
 
-  // QR 생성 단계 (판매자용)
+  // QR 생성 조건 입력 단계 (판매자)
   const renderQRGenerateStep = () => (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>대여 조건 설정</Text>
+      <Text style={styles.stepSubtitle}>QR 코드 생성을 위한 대여 조건을 입력하세요</Text>
       
       <View style={styles.infoCard}>
         <Text style={styles.itemTitle}>{rentalData.itemTitle}</Text>
-        <Text style={styles.ownerInfo}>
-          대여자: {rentalData.ownerName}
-        </Text>
+        <Text style={styles.ownerInfo}>대여자: {rentalData.ownerName}</Text>
       </View>
 
       <View style={styles.form}>
@@ -170,94 +203,66 @@ export default function QRPaymentScreen() {
     </View>
   );
 
-  // QR 스캔 단계
-  const renderQRScanStep = () => (
+  // QR 코드 표시 단계 (판매자)
+  const renderQRDisplayStep = () => (
     <View style={styles.stepContainer}>
+      <Text style={styles.stepTitle}>QR 코드 생성 완료</Text>
+      <Text style={styles.stepSubtitle}>대여자가 이 QR 코드를 스캔하면 대여가 시작됩니다</Text>
+      
       <View style={styles.qrContainer}>
         <View style={styles.qrCodeBox}>
           <QrCode size={120} color={Colors.primary} />
           <Text style={styles.qrToken}>Token: {qrToken.slice(-8)}</Text>
         </View>
-        <Text style={styles.qrTitle}>QR 코드가 생성되었습니다</Text>
-        <Text style={styles.qrSubtitle}>
-          대여자가 이 QR 코드를 스캔하여
-          {'\n'}대여 계약을 시작할 수 있습니다
-        </Text>
+        
+        <View style={styles.timerContainer}>
+          <Clock size={16} color={Colors.warning} />
+          <Text style={styles.timerText}>유효시간: {Math.floor(tokenExpiry / 60)}분 {tokenExpiry % 60}초</Text>
+        </View>
         
         <View style={styles.rentalSummary}>
-          <Text style={styles.summaryTitle}>대여 조건</Text>
+          <Text style={styles.summaryTitle}>설정된 대여 조건</Text>
           <Text style={styles.summaryItem}>• 대여료: {rentalData.rentalFee}원/일</Text>
           <Text style={styles.summaryItem}>• 반납일: {rentalData.returnDate}</Text>
           <Text style={styles.summaryItem}>• 연체료: {rentalData.lateFee}원/일</Text>
         </View>
       </View>
       
-      <TouchableOpacity style={styles.primaryButton} onPress={handleQRScan}>
-        <Text style={styles.primaryButtonText}>QR 스캔 시뮬레이션</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonGroup}>
+        <TouchableOpacity style={styles.secondaryButton} onPress={() => setStep('qr-generate')}>
+          <Text style={styles.secondaryButtonText}>조건 수정</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.primaryButton} onPress={handleQRScan}>
+          <Text style={styles.primaryButtonText}>QR 스캔 시뮬레이션</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
-  // 대여자 정보 입력 단계
-  const renderFormStep = () => (
-    <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>대여자 정보 입력</Text>
-      
-      <View style={styles.infoCard}>
-        <Text style={styles.itemTitle}>{rentalData.itemTitle}</Text>
-        <Text style={styles.ownerInfo}>
-          임대자: {rentalData.ownerName}
-        </Text>
-      </View>
-
-      <View style={styles.rentalConditions}>
-        <Text style={styles.conditionsTitle}>확인된 대여 조건</Text>
-        <View style={styles.conditionItem}>
-          <Text style={styles.conditionLabel}>대여료:</Text>
-          <Text style={styles.conditionValue}>{rentalData.rentalFee}원/일</Text>
-        </View>
-        <View style={styles.conditionItem}>
-          <Text style={styles.conditionLabel}>반납일:</Text>
-          <Text style={styles.conditionValue}>{rentalData.returnDate}</Text>
-        </View>
-        <View style={styles.conditionItem}>
-          <Text style={styles.conditionLabel}>연체료:</Text>
-          <Text style={styles.conditionValue}>{rentalData.lateFee}원/일</Text>
-        </View>
-      </View>
-
-      <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>대여자명 *</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="이름을 입력하세요"
-            value={rentalData.renterName}
-            onChangeText={(text) => setRentalData(prev => ({ ...prev, renterName: text }))}
-          />
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.primaryButton} onPress={handleFormSubmit}>
-        <Text style={styles.primaryButtonText}>다음</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  // 전자서명 단계
+  // 전자서명 단계 (양쪽 모두)
   const renderSignatureStep = () => (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>전자서명</Text>
+      <Text style={styles.stepSubtitle}>대여 계약서에 서명해주세요</Text>
       
       <View style={styles.contractSummary}>
-        <Text style={styles.contractTitle}>대여 계약서</Text>
+        <Text style={styles.contractTitle}>📋 대여 계약서</Text>
         <View style={styles.contractDetails}>
           <Text style={styles.contractItem}>물건: {rentalData.itemTitle}</Text>
           <Text style={styles.contractItem}>대여료: {rentalData.rentalFee}원/일</Text>
           <Text style={styles.contractItem}>반납일: {rentalData.returnDate}</Text>
           <Text style={styles.contractItem}>연체료: {rentalData.lateFee}원/일</Text>
-          <Text style={styles.contractItem}>대여자: {rentalData.renterName}</Text>
           <Text style={styles.contractItem}>임대자: {rentalData.ownerName}</Text>
+        </View>
+        
+        <View style={styles.agreementBox}>
+          <Text style={styles.agreementTitle}>📌 계약 조건 동의</Text>
+          <Text style={styles.agreementText}>
+            • 대여료는 안전거래로 홀딩됩니다{'\n'}
+            • 반납 지연 시 연체료가 자동 부과됩니다{'\n'}
+            • 파손 시 게시글 명시 금액으로 보상합니다{'\n'}
+            • 전자서명으로 법적 효력이 발생합니다
+          </Text>
         </View>
       </View>
 
@@ -266,7 +271,7 @@ export default function QRPaymentScreen() {
         onPress={() => setShowSignature(true)}
       >
         <FileText size={20} color={Colors.primary} />
-        <Text style={styles.signatureButtonText}>서명하기</Text>
+        <Text style={styles.signatureButtonText}>전자서명 하기</Text>
       </TouchableOpacity>
 
       <Modal visible={showSignature} animationType="slide">
@@ -278,7 +283,7 @@ export default function QRPaymentScreen() {
             >
               <Text style={styles.cancelButtonText}>취소</Text>
             </TouchableOpacity>
-            <Text style={styles.signatureTitle}>서명해주세요</Text>
+            <Text style={styles.signatureTitle}>전자서명</Text>
             <TouchableOpacity 
               onPress={() => signatureRef.current?.clearSignature()}
               style={styles.clearButton}
@@ -288,6 +293,9 @@ export default function QRPaymentScreen() {
           </View>
           
           <View style={styles.signatureContainer}>
+            <Text style={styles.signatureInstruction}>
+              아래 영역에 서명해주세요
+            </Text>
             <SignatureCapture
               ref={signatureRef}
               style={styles.signatureCanvas}
@@ -330,26 +338,26 @@ export default function QRPaymentScreen() {
         <View style={styles.successIcon}>
           <Check size={40} color="white" />
         </View>
-        <Text style={styles.successTitle}>계약 완료!</Text>
+        <Text style={styles.successTitle}>계약 체결 완료!</Text>
         <Text style={styles.successSubtitle}>
-          대여 계약이 성공적으로 체결되었습니다
+          전자서명이 완료되어 대여 계약이 성공적으로 체결되었습니다
         </Text>
       </View>
 
       <View style={styles.completeSummary}>
-        <Text style={styles.summaryTitle}>계약 정보</Text>
+        <Text style={styles.summaryTitle}>✅ 계약 정보</Text>
         <View style={styles.summaryDetails}>
           <Text style={styles.summaryItem}>물건: {rentalData.itemTitle}</Text>
           <Text style={styles.summaryItem}>대여료: {rentalData.rentalFee}원/일</Text>
           <Text style={styles.summaryItem}>반납일: {rentalData.returnDate}</Text>
           <Text style={styles.summaryItem}>연체료: {rentalData.lateFee}원/일</Text>
-          <Text style={styles.summaryItem}>대여자: {rentalData.renterName}</Text>
         </View>
         
         <View style={styles.paymentInfo}>
-          <Text style={styles.paymentTitle}>💳 결제 정보</Text>
-          <Text style={styles.paymentText}>대여료가 안전거래로 홀딩되었습니다</Text>
-          <Text style={styles.paymentText}>반납 완료 시 자동 정산됩니다</Text>
+          <Text style={styles.paymentTitle}>💳 안전거래 홀딩</Text>
+          <Text style={styles.paymentText}>• 대여료가 안전거래로 홀딩되었습니다</Text>
+          <Text style={styles.paymentText}>• 반납 완료 시 자동 정산됩니다</Text>
+          <Text style={styles.paymentText}>• 연체료는 반납 시 추가 정산됩니다</Text>
         </View>
       </View>
 
@@ -363,10 +371,8 @@ export default function QRPaymentScreen() {
     switch (step) {
       case 'qr-generate':
         return renderQRGenerateStep();
-      case 'qr-scan':
-        return renderQRScanStep();
-      case 'form':
-        return renderFormStep();
+      case 'qr-display':
+        return renderQRDisplayStep();
       case 'signature':
         return renderSignatureStep();
       case 'complete':
@@ -377,8 +383,12 @@ export default function QRPaymentScreen() {
   };
 
   const getStepIndex = () => {
-    const steps = ['qr-generate', 'qr-scan', 'form', 'signature', 'complete'];
+    const steps = ['qr-generate', 'qr-display', 'signature', 'complete'];
     return steps.indexOf(step);
+  };
+
+  const getStepNames = () => {
+    return ['조건설정', 'QR생성', '전자서명', '완료'];
   };
 
   return (
@@ -392,7 +402,7 @@ export default function QRPaymentScreen() {
       </View>
       
       <View style={styles.progressContainer}>
-        {['QR생성', 'QR스캔', '정보입력', '서명', '완료'].map((stepName, index) => (
+        {getStepNames().map((stepName, index) => (
           <View key={stepName} style={styles.progressStep}>
             <View style={[
               styles.progressDot,
@@ -437,7 +447,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111827',
     textAlign: 'center',
-    marginLeft: -28, // 백버튼 크기만큼 보정
+    marginLeft: -28,
   },
   headerRight: {
     width: 28,
@@ -487,6 +497,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#111827',
+    marginBottom: 8,
+  },
+  stepSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
     marginBottom: 24,
   },
   infoCard: {
@@ -544,7 +559,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   qrToken: {
     fontSize: 12,
@@ -552,18 +567,20 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontFamily: 'monospace',
   },
-  qrTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  qrSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 20,
+  timerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     marginBottom: 24,
+  },
+  timerText: {
+    fontSize: 12,
+    color: '#92400E',
+    marginLeft: 4,
+    fontWeight: '500',
   },
   rentalSummary: {
     backgroundColor: Colors.primaryLight,
@@ -584,31 +601,21 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 4,
   },
-  rentalConditions: {
-    backgroundColor: '#F9FAFB',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 12,
   },
-  conditionsTitle: {
+  secondaryButton: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
+    color: '#6B7280',
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
-    marginBottom: 12,
-  },
-  conditionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  conditionLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  conditionValue: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#111827',
   },
   contractSummary: {
     flex: 1,
@@ -626,11 +633,30 @@ const styles = StyleSheet.create({
   },
   contractDetails: {
     gap: 12,
+    marginBottom: 20,
   },
   contractItem: {
     fontSize: 14,
     color: '#374151',
     lineHeight: 20,
+  },
+  agreementBox: {
+    backgroundColor: Colors.primaryLight,
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.primaryBorder,
+  },
+  agreementTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primaryDark,
+    marginBottom: 8,
+  },
+  agreementText: {
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 18,
   },
   signatureButton: {
     flexDirection: 'row',
@@ -684,6 +710,12 @@ const styles = StyleSheet.create({
   signatureContainer: {
     flex: 1,
     margin: 16,
+  },
+  signatureInstruction: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   signatureCanvas: {
     flex: 1,
