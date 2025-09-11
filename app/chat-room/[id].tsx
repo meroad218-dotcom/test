@@ -35,53 +35,8 @@ interface ChatRoomData {
   itemTitle: string;
   itemImage: string;
   isRenting?: boolean;
-  isRenting?: boolean;
 }
 
-// 채팅방별 메시지 데이터
-const CHAT_MESSAGES: { [key: string]: Message[] } = {
-  'sample_chat_1': [
-    {
-      id: '1',
-      text: '안녕하세요! 캠핑 텐트 대여 문의드립니다.',
-      isMe: true,
-      timestamp: '14:30',
-    },
-    {
-      id: '2',
-      text: '안녕하세요! 언제 사용하실 예정이신가요?',
-      isMe: false,
-      timestamp: '14:32',
-      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
-    {
-      id: '3',
-      text: '이번 주말 1박2일로 사용하고 싶습니다.',
-      isMe: true,
-      timestamp: '14:33',
-    },
-    {
-      id: '4',
-      text: '네, 가능합니다! 내일 오후 3시에 만날까요?',
-      isMe: false,
-      timestamp: '14:35',
-      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
-  ],
-  'sample_chat_2': [
-    {
-      id: '1',
-      text: '전동드릴 대여 가능한가요?',
-      isMe: true,
-      timestamp: '11:15',
-    },
-    {
-      id: '2',
-      text: '네, 가능합니다! 언제 필요하신가요?',
-      isMe: false,
-      timestamp: '11:18',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
 // 채팅방별 메시지 데이터
 const CHAT_MESSAGES: { [key: string]: Message[] } = {
   'sample_chat_1': [
@@ -140,7 +95,7 @@ const CHAT_MESSAGES: { [key: string]: Message[] } = {
     },
   ],
 };
-    id: 'sample_chat_2',
+
 // 채팅방별 데이터
 const CHAT_ROOM_DATA: { [key: string]: ChatRoomData } = {
   'sample_chat_1': {
