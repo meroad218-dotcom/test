@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { QrCode, FileText, Check, ArrowLeft, Calendar, DollarSign, Clock } from 'lucide-react-native';
+import { QrCode, FileText, Check, Calendar, DollarSign, Clock } from 'lucide-react-native';
 import SignatureCapture from 'react-native-signature-canvas';
 import Colors from '@/constants/Theme';
+import BackButton from '@/components/BackButton';
 
 interface RentalQRData {
   itemId: string;
@@ -50,11 +51,6 @@ export default function QRPaymentScreen() {
   });
 
   const signatureRef = useRef<any>(null);
-
-  const handleBack = () => {
-    console.log('Back button pressed');
-    router.back();
-  };
 
   // 1단계: QR 생성 조건 입력 (판매자)
   const handleGenerateQR = () => {
@@ -381,9 +377,7 @@ export default function QRPaymentScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <ArrowLeft size={24} color="#111827" />
-        </TouchableOpacity>
+        <BackButton />
         <Text style={styles.headerTitle}>QR 대여 계약</Text>
         <View style={styles.headerRight} />
       </View>
@@ -425,20 +419,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  backButton: {
-    padding: 4,
-    cursor: 'pointer',
-  },
   headerTitle: {
     flex: 1,
     fontSize: 20,
     fontWeight: '600',
     color: '#111827',
     textAlign: 'center',
-    marginLeft: -28,
+    marginLeft: -40,
   },
   headerRight: {
-    width: 28,
+    width: 40,
   },
   progressContainer: {
     flexDirection: 'row',

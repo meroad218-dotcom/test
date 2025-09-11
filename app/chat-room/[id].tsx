@@ -13,9 +13,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Send, QrCode } from 'lucide-react-native';
+import { Send, QrCode } from 'lucide-react-native';
 import { useUser } from '@/hooks/UserContext';
 import { ComponentColors } from '@/constants/Theme';
+import BackButton from '@/components/BackButton';
 
 interface Message {
   id: string;
@@ -102,10 +103,6 @@ export default function ChatRoomScreen() {
     }
   }, [id, ownerName, ownerAvatar, itemTitle, itemImage]);
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleSendMessage = () => {
     if (inputText.trim() === '') return;
 
@@ -163,9 +160,7 @@ export default function ChatRoomScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <ArrowLeft size={24} color="#111827" />
-        </TouchableOpacity>
+        <BackButton />
         <View style={styles.headerInfo}>
           <Image source={{ uri: chatRoom.itemImage }} style={styles.headerItemImage} />
           <View style={styles.headerText}>
@@ -237,14 +232,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  backButton: {
-    padding: 4,
-    marginRight: 12,
-  },
   headerInfo: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 8,
   },
   headerItemImage: {
     width: 32,

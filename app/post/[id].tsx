@@ -11,10 +11,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, MapPin, Clock, Eye, Heart, MessageCircle, Share } from 'lucide-react-native';
+import { MapPin, Clock, Eye, Heart, MessageCircle, Share } from 'lucide-react-native';
 import { useUser } from '@/hooks/UserContext';
 import { useChat } from '@/hooks/ChatContext';
 import Colors from '@/constants/Theme';
+import BackButton from '@/components/BackButton';
 
 const { width } = Dimensions.get('window');
 
@@ -97,10 +98,6 @@ export default function PostDetailScreen() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleChat = () => {
     // 자신의 게시물인지 확인
     if (post.owner.id === currentUser.id) {
@@ -168,9 +165,7 @@ export default function PostDetailScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <ArrowLeft size={24} color="#111827" />
-        </TouchableOpacity>
+        <BackButton />
         <View style={styles.headerActions}>
           <TouchableOpacity onPress={handleShare} style={styles.headerButton}>
             <Share size={20} color="#111827" />
@@ -287,9 +282,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-  },
-  backButton: {
-    padding: 4,
   },
   headerActions: {
     flexDirection: 'row',
